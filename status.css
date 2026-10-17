@@ -18,9 +18,14 @@
     --stopped: #ef6464;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
-html { min-height: 100%; background: var(--bg); }
+html {
+    min-height: 100%;
+    background: var(--bg);
+}
 
 body {
     margin: 0;
@@ -33,109 +38,586 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-a { color: inherit; text-decoration: none; }
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
-.page-shell { width: min(100% - 40px, 1060px); margin: 0 auto; }
+a:focus-visible {
+    outline: 2px solid var(--connected);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.page-shell {
+    width: min(100% - 40px, 1060px);
+    margin: 0 auto;
+}
 
 .topbar {
-    height: 82px;
+    min-height: 82px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
     border-bottom: 1px solid var(--border);
 }
 
-.brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 750; letter-spacing: -.035em; }
-.brand-avatar { width: 31px; height: 31px; border-radius: 10px; object-fit: cover; }
-.brand-divider { height: 22px; width: 1px; background: rgba(255,255,255,.14); margin: 0 2px 0 5px; }
-.brand-subtitle { color: var(--muted); font-size: 13px; font-weight: 500; letter-spacing: 0; }
-.support-link { color: #c6c9d0; font-size: 13px; font-weight: 600; transition: color .2s ease; }
-.support-link:hover { color: white; }
-.support-link span { margin-left: 4px; color: var(--muted); }
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 750;
+    letter-spacing: -.035em;
+}
 
-.intro { padding: 62px 0 27px; }
-.eyebrow { margin: 0 0 14px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .16em; }
-.intro .eyebrow { display: flex; align-items: center; gap: 9px; }
-.live-pulse { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ready); box-shadow: 0 0 0 4px rgba(56,201,139,.1); }
-h1 { margin: 0; font-size: clamp(31px, 5vw, 45px); line-height: 1.13; letter-spacing: -.055em; font-weight: 750; }
-.intro-copy { margin: 14px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.brand-avatar {
+    width: 31px;
+    height: 31px;
+    border-radius: 10px;
+    object-fit: cover;
+}
 
-.overall-card, .metric-card, .shard-card {
+.brand-divider {
+    height: 22px;
+    width: 1px;
+    background: rgba(255, 255, 255, .14);
+    margin: 0 2px 0 5px;
+}
+
+.brand-subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.support-link {
+    color: #c6c9d0;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color .2s ease;
+}
+
+.support-link:hover {
+    color: white;
+}
+
+.support-link span {
+    margin-left: 4px;
+    color: var(--muted);
+}
+
+.intro {
+    padding: 62px 0 27px;
+}
+
+.eyebrow {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+}
+
+.intro .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.live-pulse {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: var(--ready);
+    box-shadow: 0 0 0 4px rgba(56, 201, 139, .1);
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(31px, 5vw, 45px);
+    line-height: 1.13;
+    letter-spacing: -.055em;
+    font-weight: 750;
+}
+
+.intro-copy {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.overall-card,
+.metric-card,
+.shard-card {
     border: 1px solid var(--border);
-    background: linear-gradient(135deg, rgba(255,255,255,.025), transparent 75%), var(--panel);
+    background: linear-gradient(135deg, rgba(255, 255, 255, .025), transparent 75%), var(--panel);
     border-radius: 15px;
 }
 
-.overall-card { min-height: 122px; padding: 25px 27px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.overall-main { display: flex; align-items: center; gap: 17px; min-width: 0; }
-.overall-icon { width: 43px; height: 43px; flex: 0 0 43px; display: grid; place-items: center; border-radius: 13px; color: var(--ready); background: rgba(56,201,139,.1); }
-.overall-icon svg { width: 22px; height: 22px; }
-.card-kicker { margin: 0 0 5px; color: var(--muted); font-size: 12px; font-weight: 500; }
-.overall-card h2 { margin: 0; font-size: 18px; letter-spacing: -.025em; }
-.subtle { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
-.updated { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; white-space: nowrap; }
-.updated-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ready); }
+.overall-card {
+    min-height: 122px;
+    padding: 25px 27px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
 
-.metrics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
-.metric-card { padding: 21px 22px 20px; min-width: 0; }
-.metric-heading { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; font-weight: 600; }
-.metric-icon { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,.045); color: #c3c6ce; font-size: 16px; }
-.metric-value { margin: 19px 0 6px; font-size: 31px; font-weight: 750; letter-spacing: -.055em; font-variant-numeric: tabular-nums; }
-.metric-value-small { font-size: clamp(20px, 2.8vw, 28px); letter-spacing: -.045em; }
-.metric-note { margin: 0; color: var(--subtle); font-size: 11px; line-height: 1.5; }
+.overall-main {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    min-width: 0;
+}
 
-.shards-section { padding-top: 58px; }
-.section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
-.section-heading .eyebrow { margin-bottom: 9px; }
-.section-heading h2 { margin: 0; font-size: 22px; letter-spacing: -.04em; }
-.section-count { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 11px; }
-.section-description { margin: 12px 0 21px; color: var(--muted); font-size: 12px; line-height: 1.6; }
-.shard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.shard-card { position: relative; min-width: 0; padding: 19px; outline: none; transition: border-color .18s ease, transform .18s ease, background .18s ease; }
-.shard-card:hover, .shard-card:focus-visible { border-color: rgba(255,255,255,.2); transform: translateY(-2px); background-color: var(--panel-raised); }
-.shard-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.shard-name { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; }
-.shard-mark { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; background: rgba(255,255,255,.05); color: #d4d6dc; font-size: 12px; }
-.status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 7px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-.status-pill::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-.status-ready { --state: var(--ready); }
-.status-connecting { --state: var(--connecting); }
-.status-connected { --state: var(--connected); }
-.status-idle { --state: var(--idle); }
-.status-stopping { --state: var(--stopping); }
-.status-stopped { --state: var(--stopped); }
-.status-pill { color: var(--state, var(--idle)); background: color-mix(in srgb, var(--state, var(--idle)) 10%, transparent); }
-.shard-status-line { height: 3px; margin: 18px 0 16px; border-radius: 99px; background: rgba(255,255,255,.055); overflow: hidden; }
-.shard-status-line span { display: block; height: 100%; width: 100%; background: var(--state, var(--idle)); opacity: .9; border-radius: inherit; }
-.shard-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
-.shard-metric-label { display: block; color: var(--subtle); font-size: 10px; margin-bottom: 6px; }
-.shard-metric-value { display: block; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.shard-tooltip { position: absolute; z-index: 2; left: 12px; right: 12px; bottom: calc(100% - 8px); padding: 12px 13px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: #1a1c22; box-shadow: 0 12px 32px rgba(0,0,0,.32); color: #d5d7dd; font-size: 11px; line-height: 1.65; opacity: 0; visibility: hidden; transform: translateY(5px); transition: opacity .15s ease, transform .15s ease, visibility .15s ease; pointer-events: none; }
-.shard-card:hover .shard-tooltip, .shard-card:focus-visible .shard-tooltip { opacity: 1; visibility: visible; transform: translateY(0); }
-.loading-card { grid-column: 1 / -1; padding: 26px; border: 1px dashed var(--border); border-radius: 13px; color: var(--muted); font-size: 12px; text-align: center; }
-.footer { display: flex; justify-content: space-between; gap: 20px; padding: 30px 0 35px; margin-top: 54px; border-top: 1px solid var(--border); color: var(--subtle); font-size: 11px; }
-.footer-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ready); margin-right: 6px; }
+.overall-icon {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: var(--ready);
+    background: rgba(56, 201, 139, .1);
+}
+
+.overall-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.card-kicker {
+    margin: 0 0 5px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.overall-card h2 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -.025em;
+}
+
+.subtle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.updated {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.updated-dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--ready);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.metric-card {
+    min-width: 0;
+    padding: 21px 22px 20px;
+}
+
+.metric-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.metric-icon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .045);
+    color: #c3c6ce;
+    font-size: 16px;
+}
+
+.metric-value {
+    margin: 19px 0 6px;
+    font-size: 31px;
+    font-weight: 750;
+    letter-spacing: -.055em;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.metric-value-small {
+    font-size: clamp(20px, 2.8vw, 28px);
+    letter-spacing: -.045em;
+}
+
+.metric-note {
+    margin: 0;
+    color: var(--subtle);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.shards-section {
+    padding-top: 58px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.section-heading .eyebrow {
+    margin-bottom: 9px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: -.04em;
+}
+
+.section-count {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.section-description {
+    margin: 12px 0 21px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Automatically lays out any number of shard cards. */
+.shard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 14px;
+}
+
+.shard-card {
+    position: relative;
+    min-width: 0;
+    padding: 19px;
+    outline: none;
+    transition:
+        border-color .18s ease,
+        transform .18s ease,
+        background .18s ease;
+}
+
+.shard-card:hover,
+.shard-card:focus-visible {
+    z-index: 3;
+    border-color: rgba(255, 255, 255, .2);
+    transform: translateY(-2px);
+    background-color: var(--panel-raised);
+}
+
+.shard-card:focus-visible {
+    outline: 2px solid var(--connected);
+    outline-offset: 3px;
+}
+
+.shard-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.shard-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.shard-mark {
+    width: 31px;
+    height: 31px;
+    flex: 0 0 31px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .05);
+    color: #d4d6dc;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--state, var(--idle));
+    background: color-mix(in srgb, var(--state, var(--idle)) 10%, transparent);
+}
+
+.status-pill::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.status-ready {
+    --state: var(--ready);
+}
+
+.status-connecting {
+    --state: var(--connecting);
+}
+
+.status-connected {
+    --state: var(--connected);
+}
+
+.status-idle {
+    --state: var(--idle);
+}
+
+.status-stopping {
+    --state: var(--stopping);
+}
+
+.status-stopped {
+    --state: var(--stopped);
+}
+
+.shard-status-line {
+    height: 3px;
+    margin: 18px 0 16px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, .055);
+    overflow: hidden;
+}
+
+.shard-status-line span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--state, var(--idle));
+    opacity: .9;
+}
+
+.shard-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.shard-metric-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--subtle);
+    font-size: 10px;
+}
+
+.shard-metric-value {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.shard-tooltip {
+    position: absolute;
+    z-index: 5;
+    left: 12px;
+    right: 12px;
+    bottom: calc(100% - 8px);
+    padding: 12px 13px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px;
+    background: #1a1c22;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .32);
+    color: #d5d7dd;
+    font-size: 11px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(5px);
+    transition:
+        opacity .15s ease,
+        transform .15s ease,
+        visibility .15s ease;
+    pointer-events: none;
+}
+
+.shard-card:hover .shard-tooltip,
+.shard-card:focus-visible .shard-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.loading-card {
+    grid-column: 1 / -1;
+    padding: 26px;
+    border: 1px dashed var(--border);
+    border-radius: 13px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 30px 0 35px;
+    margin-top: 54px;
+    border-top: 1px solid var(--border);
+    color: var(--subtle);
+    font-size: 11px;
+}
+
+.footer-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: var(--ready);
+}
 
 @media (max-width: 760px) {
-    .page-shell { width: min(100% - 30px, 560px); }
-    .topbar { height: 70px; }
-    .intro { padding-top: 45px; }
-    .overall-card { align-items: flex-start; flex-direction: column; padding: 21px; gap: 17px; }
-    .updated { white-space: normal; }
-    .metrics-grid { grid-template-columns: 1fr; gap: 10px; }
-    .metric-card { padding: 17px 19px; }
-    .metric-value { margin-top: 12px; }
-    .shards-section { padding-top: 44px; }
-    .shard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .shard-card { padding: 15px; }
-    .shard-card-top { align-items: flex-start; flex-direction: column; }
-    .shard-tooltip { left: 7px; right: 7px; }
-    .footer { flex-direction: column; gap: 10px; margin-top: 40px; }
+    .page-shell {
+        width: min(100% - 30px, 560px);
+    }
+
+    .topbar {
+        min-height: 70px;
+    }
+
+    .intro {
+        padding-top: 45px;
+    }
+
+    .overall-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 17px;
+        padding: 21px;
+    }
+
+    .updated {
+        white-space: normal;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .metric-card {
+        padding: 17px 19px;
+    }
+
+    .metric-value {
+        margin-top: 12px;
+    }
+
+    .shards-section {
+        padding-top: 44px;
+    }
+
+    .shard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .shard-card {
+        padding: 15px;
+    }
+
+    .shard-card-top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .shard-tooltip {
+        right: 7px;
+        left: 7px;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 40px;
+    }
 }
 
 @media (max-width: 420px) {
-    .shard-grid { grid-template-columns: 1fr; }
-    .section-heading h2 { font-size: 20px; }
-    .brand { gap: 8px; }
-    .brand-avatar { width: 28px; height: 28px; }
+    .shard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading h2 {
+        font-size: 20px;
+    }
+
+    .brand {
+        gap: 8px;
+    }
+
+    .brand-avatar {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
