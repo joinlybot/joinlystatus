@@ -24,6 +24,12 @@ function isNonNegativeInteger(value) {
     return Number.isInteger(value) && value >= 0;
 }
 
+/*
+ * Joinly's bot publisher sends one-based shard IDs:
+ * 1 through totalShards.
+ *
+ * Keep this convention consistent throughout the website.
+ */
 function validateSnapshot(snapshot) {
     if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
         return false;
@@ -47,8 +53,8 @@ function validateSnapshot(snapshot) {
         if (
             !shard ||
             !Number.isInteger(shard.id) ||
-            shard.id < 0 ||
-            shard.id >= snapshot.totalShards ||
+            shard.id < 1 ||
+            shard.id > snapshot.totalShards ||
             typeof shard.status !== "string" ||
             !isNonNegativeInteger(shard.guildCount)
         ) {
@@ -68,8 +74,8 @@ function validateSnapshot(snapshot) {
             !snapshot.missingShardIds.every(
                 id =>
                     Number.isInteger(id) &&
-                    id >= 0 &&
-                    id < snapshot.totalShards
+                    id >= 1 &&
+                    id <= snapshot.totalShards
             )
         ) {
             return false;
@@ -85,6 +91,7 @@ module.exports = async (req, res) => {
 
     if (req.method !== "GET") {
         res.setHeader("Allow", "GET");
+
         return res.status(405).json({
             error: "Method not allowed."
         });
