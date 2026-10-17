@@ -4,43 +4,162 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b0c0f">
-    <meta name="description" content="Live service status and shard health for Joinly, the Discord bot.">
+    <meta name="description" content="Live service status, shard health, uptime and server statistics for Joinly, the Discord bot.">
+
     <title>Joinly Status</title>
+
     <link rel="icon" href="https://cdn.discordapp.com/avatars/1528785988237922304/f57cf1a20aa0da13d47f6e8bcba77ec7.png?size=256">
     <link rel="stylesheet" href="/status.css">
     <script src="/status.js" defer></script>
+
+    <!-- Discord Components Embed -->
+    <script id="discord:component-embed" type="application/json">
+    {
+        "component": {
+            "type": 17,
+            "accent_color": 5793266,
+            "components": [
+                {
+                    "type": 9,
+                    "components": [
+                        {
+                            "type": 10,
+                            "content": "## [Joinly Status](https://status.joinly-bot.xyz/)\nLive service health and shard statistics for Joinly.\n\n-# Monitor bot availability, connected servers, shard health and uptime in real time."
+                        },
+                        {
+                            "type": 10,
+                            "content": "### Service Monitoring\n🟢 **Live Status Dashboard**\nView the latest reported status, server count, available shards and process uptime on our live status page."
+                        }
+                    ],
+                    "accessory": {
+                        "type": 11,
+                        "media": {
+                            "url": "https://i.ibb.co/Xk5kHMWY/joinly.png"
+                        }
+                    }
+                },
+                {
+                    "type": 14,
+                    "spacing": 2,
+                    "divider": true
+                },
+                {
+                    "type": 10,
+                    "content": "### Quick Links\nAccess the status dashboard or explore the Joinly services below."
+                },
+                {
+                    "type": 1,
+                    "components": [
+                        {
+                            "type": 2,
+                            "label": "Live Status",
+                            "style": 5,
+                            "url": "https://status.joinly-bot.xyz/",
+                            "disabled": false
+                        },
+                        {
+                            "type": 2,
+                            "label": "Dashboard",
+                            "style": 5,
+                            "url": "https://dashboard.joinly-bot.xyz/login",
+                            "disabled": false
+                        },
+                        {
+                            "type": 2,
+                            "label": "Documentation",
+                            "style": 5,
+                            "url": "https://docs.joinly-bot.xyz/",
+                            "disabled": false
+                        },
+                        {
+                            "type": 2,
+                            "label": "Support Server",
+                            "style": 5,
+                            "url": "https://discord.gg/PTrU8DQacj",
+                            "disabled": false
+                        }
+                    ]
+                },
+                {
+                    "type": 14,
+                    "spacing": 2,
+                    "divider": true
+                },
+                {
+                    "type": 10,
+                    "content": "-# Joinly Status • Live monitoring and infrastructure overview"
+                }
+            ]
+        }
+    }
+    </script>
 </head>
+
 <body>
     <main class="page-shell">
+
         <header class="topbar">
             <a class="brand" href="https://joinly-bot.xyz/" aria-label="Joinly home">
-                <img src="https://cdn.discordapp.com/avatars/1528785988237922304/f57cf1a20aa0da13d47f6e8bcba77ec7.png?size=256" alt="" class="brand-avatar">
+                <img
+                    src="https://cdn.discordapp.com/avatars/1528785988237922304/f57cf1a20aa0da13d47f6e8bcba77ec7.png?size=256"
+                    alt=""
+                    class="brand-avatar"
+                >
                 <span>Joinly</span>
                 <span class="brand-divider" aria-hidden="true"></span>
                 <span class="brand-subtitle">Status</span>
             </a>
-            <a class="support-link" href="https://discord.gg/PTrU8DQacj" target="_blank" rel="noopener noreferrer">Support <span aria-hidden="true">↗</span></a>
+
+            <a
+                class="support-link"
+                href="https://discord.gg/PTrU8DQacj"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Support <span aria-hidden="true">↗</span>
+            </a>
         </header>
 
         <section class="intro">
-            <p class="eyebrow"><span class="live-pulse" aria-hidden="true"></span> SYSTEM STATUS</p>
+            <p class="eyebrow">
+                <span class="live-pulse" aria-hidden="true"></span>
+                SYSTEM STATUS
+            </p>
+
             <h1>Everything at a glance.</h1>
-            <p class="intro-copy">Live connection health and shard statistics for Joinly.</p>
+
+            <p class="intro-copy">
+                Live connection health and shard statistics for Joinly.
+            </p>
         </section>
 
         <section class="overall-card" aria-labelledby="overall-heading">
             <div class="overall-main">
                 <div class="overall-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M5 12.5 9.2 16.5 19 6.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path
+                            d="M5 12.5 9.2 16.5 19 6.8"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
                 </div>
+
                 <div>
-                    <p class="card-kicker" id="overall-heading">Current status</p>
+                    <p class="card-kicker" id="overall-heading">
+                        Current status
+                    </p>
+
                     <h2 id="bot-status-label">Checking connection…</h2>
-                    <p class="subtle" id="status-description">Fetching the latest status snapshot.</p>
+
+                    <p class="subtle" id="status-description">
+                        Fetching the latest status snapshot.
+                    </p>
                 </div>
             </div>
+
             <div class="updated">
                 <span class="updated-dot" aria-hidden="true"></span>
                 <span id="last-updated">Waiting for first update</span>
@@ -49,17 +168,31 @@
 
         <section class="metrics-grid" aria-label="Joinly statistics">
             <article class="metric-card">
-                <div class="metric-heading"><span class="metric-icon">⌂</span><span>Guilds</span></div>
+                <div class="metric-heading">
+                    <span class="metric-icon">⌂</span>
+                    <span>Guilds</span>
+                </div>
+
                 <p class="metric-value" id="guild-count">—</p>
                 <p class="metric-note">Servers connected to Joinly</p>
             </article>
+
             <article class="metric-card">
-                <div class="metric-heading"><span class="metric-icon">◈</span><span>Available shards</span></div>
+                <div class="metric-heading">
+                    <span class="metric-icon">◈</span>
+                    <span>Available shards</span>
+                </div>
+
                 <p class="metric-value" id="available-shards">—</p>
                 <p class="metric-note">Ready shards / total shards</p>
             </article>
+
             <article class="metric-card">
-                <div class="metric-heading"><span class="metric-icon">↗</span><span>Process uptime</span></div>
+                <div class="metric-heading">
+                    <span class="metric-icon">↗</span>
+                    <span>Process uptime</span>
+                </div>
+
                 <p class="metric-value metric-value-small" id="process-uptime">—</p>
                 <p class="metric-note">Time since the bot process started</p>
             </article>
@@ -71,9 +204,14 @@
                     <p class="eyebrow">INFRASTRUCTURE</p>
                     <h2>Shard overview</h2>
                 </div>
+
                 <span class="section-count" id="shard-count">1 shard</span>
             </div>
-            <p class="section-description">Hover over a shard or focus it with your keyboard to view its metrics.</p>
+
+            <p class="section-description">
+                Hover over a shard or focus it with your keyboard to view its metrics.
+            </p>
+
             <div class="shard-grid" id="shard-grid" aria-live="polite">
                 <div class="loading-card">Loading shard information…</div>
             </div>
@@ -81,8 +219,13 @@
 
         <footer class="footer">
             <span>Joinly Status</span>
-            <span><span class="footer-dot" aria-hidden="true"></span> Updates automatically every 15 seconds</span>
+
+            <span>
+                <span class="footer-dot" aria-hidden="true"></span>
+                Updates automatically every 15 seconds
+            </span>
         </footer>
+
     </main>
 </body>
 </html>
