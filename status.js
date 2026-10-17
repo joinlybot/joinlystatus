@@ -28,11 +28,13 @@
         ];
 
         const value = String(status || "stopped").toLowerCase();
+
         return allowed.includes(value) ? value : "stopped";
     }
 
     function titleCase(value) {
         const text = String(value || "stopped");
+
         return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
     }
 
@@ -260,13 +262,17 @@
                 ? configuredTotal
                 : null;
 
+        /*
+         * The bot publishes one-based shard IDs:
+         * 1 through totalShards.
+         */
         const shards = Array.isArray(snapshot.shards)
             ? snapshot.shards.filter(shard =>
                 shard &&
                 Number.isInteger(shard.id) &&
-                shard.id >= 0 &&
                 totalShards !== null &&
-                shard.id < totalShards &&
+                shard.id >= 1 &&
+                shard.id <= totalShards &&
                 typeof shard.status === "string" &&
                 Number.isFinite(Number(shard.guildCount)) &&
                 Number(shard.guildCount) >= 0
