@@ -1,3 +1,4 @@
+
 (() => {
     const REFRESH_INTERVAL_MS = 15_000;
     const API_URL = "/api/status";
@@ -18,14 +19,22 @@
     const numberFormat = new Intl.NumberFormat();
 
     function escapeStatusClass(status) {
-        const allowed = ["idle", "connecting", "connected", "ready", "stopping", "stopped"];
+        const allowed = [
+            "idle",
+            "connecting",
+            "connected",
+            "ready",
+            "stopping",
+            "stopped"
+        ];
+
         const value = String(status || "stopped").toLowerCase();
         return allowed.includes(value) ? value : "stopped";
     }
 
     function titleCase(value) {
-        return String(value || "stopped").charAt(0).toUpperCase()
-            + String(value || "stopped").slice(1).toLowerCase();
+        const text = String(value || "stopped");
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
     }
 
     function formatDuration(totalSeconds) {
@@ -38,52 +47,110 @@
         if (days > 0) return `${days}d ${hours}h ${minutes}m`;
         if (hours > 0) return `${hours}h ${minutes}m`;
         if (minutes > 0) return `${minutes}m ${remainingSeconds}s`;
+
         return `${remainingSeconds}s`;
     }
 
     function formatLatency(value) {
         const latency = Number(value);
-        return value === null || value === undefined || !Number.isFinite(latency) || latency < 0
-            ? "—"
-            : `${Math.round(latency)} ms`;
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === "" ||
+            !Number.isFinite(latency) ||
+            latency < 0
+        ) {
+            return "—";
+        }
+
+        return `${Math.round(latency)} ms`;
     }
 
     function formatUpdatedAt(value) {
         if (!value) return "Waiting for first update";
+
         const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return "Update received";
-        return `Updated ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+
+        if (Number.isNaN(date.getTime())) {
+            return "Update received";
+        }
+
+        return `Updated ${date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        })}`;
     }
 
-    function setOverallState(online, state) {
-        const label = online ? "All systems operational" : "Service unavailable";
-        elements.botStatusLabel.textContent = label;
-        elements.statusDescription.textContent = online
-            ? "Joinly is connected to Discord and reporting live metrics."
-            : "Live bot data is currently unavailable. The bot may be offline or still starting.";
+    function setOverallState(state, description) {
+        const states = {
+            operational: {
+                label: "All systems operational",
+                description:
+                    "All configured shards are ready and reporting live metrics.",
+                color: "var(--ready)",
+                background: "rgba(56,201,139,.1)"
+            },
+            degraded: {
+                label: "Degraded performance",
+                description:
+                    "Some shards are unavailable or shard statistics are incomplete.",
+                color: "var(--stopping)",
+                background: "rgba(242,154,90,.1)"
+            },
+            offline: {
+                label: "Service unavailable",
+                description:
+                    "No shards are ready, or live status data is unavailable."
+                    ,
+                color: "var(--stopped)",
+                background: "rgba(239,100,100,.1)"
+            },
+            stopping: {
+                label: "Joinly is stopping",
+                description:
+                    "The bot is shutting down or restarting.",
+                color: "var(--stopping)",
+                background: "rgba(242,154,90,.1)"
+            },
+            stale: {
+                label: "Status data is stale",
+                description:
+                    "The latest bot update is too old to confirm current health.",
+                color: "var(--stopping)",
+                background: "rgba(242,154,90,.1)"
+            },
+            error: {
+                label: "Unable to check status",
+                description:
+                    "The status service could not be reached. Please try again shortly.",
+                color: "var(--stopped)",
+                background: "rgba(239,100,100,.1)"
+            }
+        };
 
-        const color = online ? "var(--ready)" : "var(--stopped)";
-        elements.overallIcon.style.color = color;
-        elements.overallIcon.style.background = online
-            ? "rgba(56,201,139,.1)"
-            : "rgba(239,100,100,.1)";
-        elements.updatedDot.style.background = color;
+        const current = states[state] || states.offline;
 
-        if (!online && state === "stopping") {
-            elements.botStatusLabel.textContent = "Joinly is stopping";
-            elements.statusDescription.textContent = "The bot is shutting down or restarting.";
-            elements.overallIcon.style.color = "var(--stopping)";
-            elements.overallIcon.style.background = "rgba(242,154,90,.1)";
-            elements.updatedDot.style.background = "var(--stopping)";
-        }
+        elements.botStatusLabel.textContent = current.label;
+        elements.statusDescription.textContent =
+            description || current.description;
+
+        elements.overallIcon.style.color = current.color;
+        elements.overallIcon.style.background = current.background;
+        elements.updatedDot.style.background = current.color;
     }
 
     function createShardCard(shard) {
         const status = escapeStatusClass(shard.status);
+
         const card = document.createElement("article");
         card.className = `shard-card status-${status}`;
         card.tabIndex = 0;
-        card.setAttribute("aria-label", `Shard ${shard.id}, ${titleCase(status)}`);
+        card.setAttribute(
+            "aria-label",
+            `Shard ${shard.id}, ${titleCase(status)}`
+        );
 
         const top = document.createElement("div");
         top.className = "shard-card-top";
@@ -97,15 +164,18 @@
 
         const title = document.createElement("span");
         title.textContent = `Shard ${shard.id}`;
+
         name.append(mark, title);
 
         const pill = document.createElement("span");
         pill.className = "status-pill";
         pill.textContent = titleCase(status);
+
         top.append(name, pill);
 
         const line = document.createElement("div");
         line.className = "shard-status-line";
+
         const lineFill = document.createElement("span");
         line.appendChild(lineFill);
 
@@ -113,71 +183,156 @@
         metrics.className = "shard-metrics";
 
         const guildMetric = document.createElement("div");
+
         const guildLabel = document.createElement("span");
         guildLabel.className = "shard-metric-label";
         guildLabel.textContent = "Guilds";
+
         const guildValue = document.createElement("span");
         guildValue.className = "shard-metric-value";
-        guildValue.textContent = numberFormat.format(Number(shard.guildCount) || 0);
+        guildValue.textContent = numberFormat.format(
+            Math.max(0, Number(shard.guildCount) || 0)
+        );
+
         guildMetric.append(guildLabel, guildValue);
 
         const latencyMetric = document.createElement("div");
+
         const latencyLabel = document.createElement("span");
         latencyLabel.className = "shard-metric-label";
         latencyLabel.textContent = "Average latency";
+
         const latencyValue = document.createElement("span");
         latencyValue.className = "shard-metric-value";
         latencyValue.textContent = formatLatency(shard.averageLatencyMs);
-        latencyMetric.append(latencyLabel, latencyValue);
 
+        latencyMetric.append(latencyLabel, latencyValue);
         metrics.append(guildMetric, latencyMetric);
 
         const tooltip = document.createElement("div");
         tooltip.className = "shard-tooltip";
         tooltip.textContent =
-            `State: ${titleCase(status)} · Guilds: ${numberFormat.format(Number(shard.guildCount) || 0)} · ` +
+            `State: ${titleCase(status)} · ` +
+            `Guilds: ${numberFormat.format(Number(shard.guildCount) || 0)} · ` +
             `Average latency: ${formatLatency(shard.averageLatencyMs)} · ` +
             `Uptime: ${formatDuration(shard.averageUptimeSeconds)}`;
 
         card.append(top, line, metrics, tooltip);
+
         return card;
     }
 
-    function render(snapshot) {
-        const shards = Array.isArray(snapshot.shards) ? snapshot.shards : [];
-        const totalShards = Math.max(1, Number(snapshot.totalShards) || shards.length || 1);
-        const readyCount = Number.isFinite(Number(snapshot.availableShards))
-            ? Number(snapshot.availableShards)
-            : shards.filter(shard => escapeStatusClass(shard.status) === "ready").length;
-
-        const online = snapshot.available !== false
-            && snapshot.botOnline === true
-            && shards.some(shard => escapeStatusClass(shard.status) === "ready");
-
-        const topState = shards.some(shard => escapeStatusClass(shard.status) === "stopping")
-            ? "stopping"
-            : (online ? "ready" : "stopped");
-
-        setOverallState(online, topState);
-
-        elements.guildCount.textContent = numberFormat.format(Number(snapshot.guildCount) || 0);
-        elements.availableShards.textContent = `${readyCount}/${totalShards}`;
-        elements.processUptime.textContent = snapshot.botOnline
-            ? formatDuration(snapshot.processUptimeSeconds)
-            : "Offline";
-        elements.lastUpdated.textContent = formatUpdatedAt(snapshot.updatedAt);
-        elements.shardCount.textContent = `${totalShards} ${totalShards === 1 ? "shard" : "shards"}`;
-
+    function renderShardGrid(shards) {
         elements.shardGrid.replaceChildren();
+
         if (!shards.length) {
             const empty = document.createElement("div");
             empty.className = "loading-card";
-            empty.textContent = "No shard data is available yet.";
+            empty.textContent = "No shard statistics are available.";
             elements.shardGrid.appendChild(empty);
             return;
         }
 
-        shards.forEach(shard => elements.shardGrid.appendChild(createShardCard(shard)));
+        shards
+            .slice()
+            .sort((a, b) => Number(a.id) - Number(b.id))
+            .forEach(shard => {
+                elements.shardGrid.appendChild(createShardCard(shard));
+            });
+    }
+
+    function render(snapshot) {
+        const shards = Array.isArray(snapshot.shards)
+            ? snapshot.shards.filter(shard =>
+                shard &&
+                Number.isInteger(Number(shard.id)) &&
+                Number(shard.id) >= 1
+            )
+            : [];
+
+        const configuredTotal = Number(snapshot.totalShards);
+        const totalShards =
+            Number.isInteger(configuredTotal) && configuredTotal > 0
+                ? configuredTotal
+                : null;
+
+        const readyCount = shards.filter(
+            shard => escapeStatusClass(shard.status) === "ready"
+        ).length;
+
+        const statisticsComplete =
+            snapshot.statisticsComplete !== false &&
+            totalShards !== null &&
+            shards.length === totalShards;
+
+        let state;
+
+        if (snapshot.stale === true) {
+            state = "stale";
+        } else if (snapshot.health === "stopping") {
+            state = "stopping";
+        } else if (snapshot.available === false || snapshot.botOnline !== true) {
+            state = readyCount > 0 ? "degraded" : "offline";
+        } else if (
+            readyCount === 0
+        ) {
+            state = "offline";
+        } else if (
+            snapshot.health === "degraded" ||
+            readyCount < totalShards ||
+            !statisticsComplete
+        ) {
+            state = "degraded";
+        } else {
+            state = "operational";
+        }
+
+        let description;
+
+        if (state === "degraded") {
+            const missingCount = totalShards === null
+                ? null
+                : Math.max(0, totalShards - shards.length);
+
+            if (missingCount > 0) {
+                description =
+                    `${readyCount} shard(s) ready. ` +
+                    `${missingCount} shard(s) have no reported statistics.`;
+            } else {
+                description =
+                    `${readyCount} of ${totalShards ?? "unknown"} configured shards are ready.`;
+            }
+        } else if (state === "stale") {
+            description =
+                snapshot.message ||
+                "The latest bot update is too old to confirm current health.";
+        } else if (state === "offline" && snapshot.message) {
+            description = snapshot.message;
+        }
+
+        setOverallState(state, description);
+
+        elements.guildCount.textContent = numberFormat.format(
+            Math.max(0, Number(snapshot.guildCount) || 0)
+        );
+
+        elements.availableShards.textContent =
+            `${readyCount}/${totalShards ?? "?"}`;
+
+        elements.processUptime.textContent =
+            snapshot.botOnline === true && state !== "stale"
+                ? formatDuration(snapshot.processUptimeSeconds)
+                : "Offline";
+
+        elements.lastUpdated.textContent = snapshot.stale === true
+            ? "Latest update is stale"
+            : formatUpdatedAt(snapshot.updatedAt);
+
+        elements.shardCount.textContent = totalShards === null
+            ? `${shards.length} reported`
+            : `${totalShards} ${totalShards === 1 ? "shard" : "shards"}`;
+
+        renderShardGrid(shards);
     }
 
     async function refreshStatus() {
@@ -185,19 +340,25 @@
             const response = await fetch(API_URL, {
                 method: "GET",
                 cache: "no-store",
-                headers: { Accept: "application/json" }
+                headers: {
+                    Accept: "application/json"
+                }
             });
 
             const data = await response.json().catch(() => ({}));
+
             if (!response.ok) {
-                throw new Error(data.error || `Status request failed (${response.status}).`);
+                throw new Error(
+                    data.error || `Status request failed (${response.status}).`
+                );
             }
 
             render(data);
         } catch (error) {
-            setOverallState(false, "stopped");
+            setOverallState("error");
             elements.lastUpdated.textContent = "Unable to refresh status";
             elements.processUptime.textContent = "—";
+
             console.error("Joinly status refresh failed:", error);
         }
     }
