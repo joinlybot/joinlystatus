@@ -1,4 +1,3 @@
-
 const STATUS_REDIS_KEY = "joinly:status";
 const STALE_AFTER_MS = 75_000;
 
@@ -30,29 +29,54 @@ function validateSnapshot(snapshot) {
         return false;
     }
 
-    if (!Array.isArray(snapshot.shards)) return false;
-
     if (
+        !Array.isArray(snapshot.shards) ||
         !isNonNegativeInteger(snapshot.totalShards) ||
         snapshot.totalShards < 1 ||
         !isNonNegativeInteger(snapshot.availableShards) ||
-        !isNonNegativeInteger(snapshot.guildCount)
+        !isNonNegativeInteger(snapshot.guildCount) ||
+        typeof snapshot.updatedAt !== "string" ||
+        !Number.isFinite(Date.parse(snapshot.updatedAt))
     ) {
         return false;
     }
 
-    if (typeof snapshot.updatedAt !== "string") return false;
+    const seenShardIds = new Set();
 
-    if (!Number.isFinite(Date.parse(snapshot.updatedAt))) return false;
+    for (const shard of snapshot.shards) {
+        if (
+            !shard ||
+            !Number.isInteger(shard.id) ||
+            shard.id < 0 ||
+            shard.id >= snapshot.totalShards ||
+            typeof shard.status !== "string" ||
+            !isNonNegativeInteger(shard.guildCount)
+        ) {
+            return false;
+        }
 
-    return snapshot.shards.every(shard =>
-        shard &&
-        Number.isInteger(shard.id) &&
-        shard.id >= 1 &&
-        shard.id <= snapshot.totalShards &&
-        typeof shard.status === "string" &&
-        isNonNegativeInteger(shard.guildCount)
-    );
+        if (seenShardIds.has(shard.id)) {
+            return false;
+        }
+
+        seenShardIds.add(shard.id);
+    }
+
+    if (snapshot.missingShardIds !== undefined) {
+        if (
+            !Array.isArray(snapshot.missingShardIds) ||
+            !snapshot.missingShardIds.every(
+                id =>
+                    Number.isInteger(id) &&
+                    id >= 0 &&
+                    id < snapshot.totalShards
+            )
+        ) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 module.exports = async (req, res) => {
@@ -61,7 +85,9 @@ module.exports = async (req, res) => {
 
     if (req.method !== "GET") {
         res.setHeader("Allow", "GET");
-        return res.status(405).json({ error: "Method not allowed." });
+        return res.status(405).json({
+            error: "Method not allowed."
+        });
     }
 
     const restUrl = process.env.UPSTASH_REDIS_REST_URL;
@@ -127,7 +153,8 @@ module.exports = async (req, res) => {
 
         const statisticsComplete =
             snapshot.statisticsComplete !== false &&
-            snapshot.shards.length === snapshot.totalShards;
+            snapshot.shards.length === snapshot.totalShards &&
+            readyShards === snapshot.totalShards;
 
         let health;
 
