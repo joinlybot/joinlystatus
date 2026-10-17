@@ -3,8 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b0c0f">
-    <meta name="description" content="Live service status, shard health, uptime and server statistics for Joinly, the Discord bot.">
 
     <title>Joinly Status</title>
 
@@ -12,87 +10,7 @@
     <link rel="stylesheet" href="/status.css">
     <script src="/status.js" defer></script>
 
-    <!-- Discord Components Embed -->
-    <script id="discord:component-embed" type="application/json">
-    {
-        "component": {
-            "type": 17,
-            "accent_color": 5793266,
-            "components": [
-                {
-                    "type": 9,
-                    "components": [
-                        {
-                            "type": 10,
-                            "content": "## [Joinly Status](https://status.joinly-bot.xyz/)\nLive service health and shard statistics for Joinly.\n\n-# Monitor bot availability, connected servers, shard health and uptime in real time."
-                        },
-                        {
-                            "type": 10,
-                            "content": "### Service Monitoring\n🟢 **Live Status Dashboard**\nView the latest reported status, server count, available shards and process uptime on our live status page."
-                        }
-                    ],
-                    "accessory": {
-                        "type": 11,
-                        "media": {
-                            "url": "https://i.ibb.co/Xk5kHMWY/joinly.png"
-                        }
-                    }
-                },
-                {
-                    "type": 14,
-                    "spacing": 2,
-                    "divider": true
-                },
-                {
-                    "type": 10,
-                    "content": "### Quick Links\nAccess the status dashboard or explore the Joinly services below."
-                },
-                {
-                    "type": 1,
-                    "components": [
-                        {
-                            "type": 2,
-                            "label": "Live Status",
-                            "style": 5,
-                            "url": "https://status.joinly-bot.xyz/",
-                            "disabled": false
-                        },
-                        {
-                            "type": 2,
-                            "label": "Dashboard",
-                            "style": 5,
-                            "url": "https://dashboard.joinly-bot.xyz/login",
-                            "disabled": false
-                        },
-                        {
-                            "type": 2,
-                            "label": "Documentation",
-                            "style": 5,
-                            "url": "https://docs.joinly-bot.xyz/",
-                            "disabled": false
-                        },
-                        {
-                            "type": 2,
-                            "label": "Support Server",
-                            "style": 5,
-                            "url": "https://discord.gg/PTrU8DQacj",
-                            "disabled": false
-                        }
-                    ]
-                },
-                {
-                    "type": 14,
-                    "spacing": 2,
-                    "divider": true
-                },
-                {
-                    "type": 10,
-                    "content": "-# Joinly Status • Live monitoring and infrastructure overview"
-                }
-            ]
-        }
-    }
-    </script>
+    <script id="discord:component-embed" type="application/json">{"component":{"type":17,"accent_color":5793266,"components":[{"type":9,"components":[{"type":10,"content":"## [Joinly Status](https://status.joinly-bot.xyz/)\nLive service status and shard monitoring for Joinly.\n \n-# 🟢 **Bot Status**    📊 **Server Statistics**    ⚡ **Shard Health**"}],"accessory":{"type":11,"media":{"url":"https://i.ibb.co/Xk5kHMWY/joinly.png"}}},{"type":14,"spacing":2,"divider":true},{"type":10,"content":"### Live Monitoring\nCheck Joinly's current availability, connected servers, available shards and process uptime on our status dashboard."},{"type":14,"spacing":2,"divider":true},{"type":1,"components":[{"type":2,"label":"Live Status","style":5,"url":"https://status.joinly-bot.xyz/","disabled":false},{"type":2,"label":"Dashboard","style":5,"url":"https://dashboard.joinly-bot.xyz/login","disabled":false},{"type":2,"label":"Documentation","style":5,"url":"https://docs.joinly-bot.xyz/","disabled":false},{"type":2,"label":"Support Server","style":5,"url":"https://discord.gg/PTrU8DQacj","disabled":false}]}]}}</script>
 </head>
 
 <body>
@@ -167,6 +85,7 @@
         </section>
 
         <section class="metrics-grid" aria-label="Joinly statistics">
+
             <article class="metric-card">
                 <div class="metric-heading">
                     <span class="metric-icon">⌂</span>
@@ -174,7 +93,10 @@
                 </div>
 
                 <p class="metric-value" id="guild-count">—</p>
-                <p class="metric-note">Servers connected to Joinly</p>
+
+                <p class="metric-note">
+                    Servers connected to Joinly
+                </p>
             </article>
 
             <article class="metric-card">
@@ -184,7 +106,10 @@
                 </div>
 
                 <p class="metric-value" id="available-shards">—</p>
-                <p class="metric-note">Ready shards / total shards</p>
+
+                <p class="metric-note">
+                    Ready shards / total shards
+                </p>
             </article>
 
             <article class="metric-card">
@@ -194,8 +119,12 @@
                 </div>
 
                 <p class="metric-value metric-value-small" id="process-uptime">—</p>
-                <p class="metric-note">Time since the bot process started</p>
+
+                <p class="metric-note">
+                    Time since the bot process started
+                </p>
             </article>
+
         </section>
 
         <section class="shards-section">
@@ -213,7 +142,9 @@
             </p>
 
             <div class="shard-grid" id="shard-grid" aria-live="polite">
-                <div class="loading-card">Loading shard information…</div>
+                <div class="loading-card">
+                    Loading shard information…
+                </div>
             </div>
         </section>
 
