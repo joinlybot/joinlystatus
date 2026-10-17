@@ -1,4 +1,3 @@
-
 (() => {
     const REFRESH_INTERVAL_MS = 15_000;
     const API_URL = "/api/status";
@@ -102,8 +101,7 @@
             offline: {
                 label: "Service unavailable",
                 description:
-                    "No shards are ready, or live status data is unavailable."
-                    ,
+                    "No shards are ready, or live status data is unavailable.",
                 color: "var(--stopped)",
                 background: "rgba(239,100,100,.1)"
             },
@@ -132,13 +130,23 @@
 
         const current = states[state] || states.offline;
 
-        elements.botStatusLabel.textContent = current.label;
-        elements.statusDescription.textContent =
-            description || current.description;
+        if (elements.botStatusLabel) {
+            elements.botStatusLabel.textContent = current.label;
+        }
 
-        elements.overallIcon.style.color = current.color;
-        elements.overallIcon.style.background = current.background;
-        elements.updatedDot.style.background = current.color;
+        if (elements.statusDescription) {
+            elements.statusDescription.textContent =
+                description || current.description;
+        }
+
+        if (elements.overallIcon) {
+            elements.overallIcon.style.color = current.color;
+            elements.overallIcon.style.background = current.background;
+        }
+
+        if (elements.updatedDot) {
+            elements.updatedDot.style.background = current.color;
+        }
     }
 
     function createShardCard(shard) {
@@ -223,47 +231,61 @@
     }
 
     function renderShardGrid(shards) {
-        elements.shardGrid.replaceChildren();
+        if (!elements.shardGrid) return;
+
+        const fragment = document.createDocumentFragment();
 
         if (!shards.length) {
             const empty = document.createElement("div");
             empty.className = "loading-card";
             empty.textContent = "No shard statistics are available.";
-            elements.shardGrid.appendChild(empty);
-            return;
+            fragment.appendChild(empty);
+        } else {
+            shards
+                .slice()
+                .sort((a, b) => a.id - b.id)
+                .forEach(shard => {
+                    fragment.appendChild(createShardCard(shard));
+                });
         }
 
-        shards
-            .slice()
-            .sort((a, b) => Number(a.id) - Number(b.id))
-            .forEach(shard => {
-                elements.shardGrid.appendChild(createShardCard(shard));
-            });
+        elements.shardGrid.replaceChildren(fragment);
     }
 
     function render(snapshot) {
-        const shards = Array.isArray(snapshot.shards)
-            ? snapshot.shards.filter(shard =>
-                shard &&
-                Number.isInteger(Number(shard.id)) &&
-                Number(shard.id) >= 1
-            )
-            : [];
-
         const configuredTotal = Number(snapshot.totalShards);
+
         const totalShards =
             Number.isInteger(configuredTotal) && configuredTotal > 0
                 ? configuredTotal
                 : null;
 
-        const readyCount = shards.filter(
+        const shards = Array.isArray(snapshot.shards)
+            ? snapshot.shards.filter(shard =>
+                shard &&
+                Number.isInteger(shard.id) &&
+                shard.id >= 0 &&
+                totalShards !== null &&
+                shard.id < totalShards &&
+                typeof shard.status === "string" &&
+                Number.isFinite(Number(shard.guildCount)) &&
+                Number(shard.guildCount) >= 0
+            )
+            : [];
+
+        const uniqueShards = [
+            ...new Map(shards.map(shard => [shard.id, shard])).values()
+        ];
+
+        const readyCount = uniqueShards.filter(
             shard => escapeStatusClass(shard.status) === "ready"
         ).length;
 
         const statisticsComplete =
-            snapshot.statisticsComplete !== false &&
+            snapshot.statisticsComplete === true &&
             totalShards !== null &&
-            shards.length === totalShards;
+            uniqueShards.length === totalShards &&
+            readyCount === totalShards;
 
         let state;
 
@@ -271,16 +293,14 @@
             state = "stale";
         } else if (snapshot.health === "stopping") {
             state = "stopping";
-        } else if (snapshot.available === false || snapshot.botOnline !== true) {
-            state = readyCount > 0 ? "degraded" : "offline";
-        } else if (
-            readyCount === 0
-        ) {
+        } else if (snapshot.available === false) {
+            state = "offline";
+        } else if (readyCount === 0) {
             state = "offline";
         } else if (
             snapshot.health === "degraded" ||
-            readyCount < totalShards ||
-            !statisticsComplete
+            !statisticsComplete ||
+            snapshot.botOnline !== true
         ) {
             state = "degraded";
         } else {
@@ -292,7 +312,7 @@
         if (state === "degraded") {
             const missingCount = totalShards === null
                 ? null
-                : Math.max(0, totalShards - shards.length);
+                : Math.max(0, totalShards - uniqueShards.length);
 
             if (missingCount > 0) {
                 description =
@@ -312,27 +332,39 @@
 
         setOverallState(state, description);
 
-        elements.guildCount.textContent = numberFormat.format(
-            Math.max(0, Number(snapshot.guildCount) || 0)
-        );
+        if (elements.guildCount) {
+            elements.guildCount.textContent = numberFormat.format(
+                Math.max(0, Number(snapshot.guildCount) || 0)
+            );
+        }
 
-        elements.availableShards.textContent =
-            `${readyCount}/${totalShards ?? "?"}`;
+        if (elements.availableShards) {
+            elements.availableShards.textContent =
+                `${readyCount}/${totalShards ?? "?"}`;
+        }
 
-        elements.processUptime.textContent =
-            snapshot.botOnline === true && state !== "stale"
-                ? formatDuration(snapshot.processUptimeSeconds)
-                : "Offline";
+        if (elements.processUptime) {
+            elements.processUptime.textContent =
+                snapshot.botOnline === true &&
+                state !== "stale" &&
+                state !== "offline"
+                    ? formatDuration(snapshot.processUptimeSeconds)
+                    : "Offline";
+        }
 
-        elements.lastUpdated.textContent = snapshot.stale === true
-            ? "Latest update is stale"
-            : formatUpdatedAt(snapshot.updatedAt);
+        if (elements.lastUpdated) {
+            elements.lastUpdated.textContent = snapshot.stale === true
+                ? "Latest update is stale"
+                : formatUpdatedAt(snapshot.updatedAt);
+        }
 
-        elements.shardCount.textContent = totalShards === null
-            ? `${shards.length} reported`
-            : `${totalShards} ${totalShards === 1 ? "shard" : "shards"}`;
+        if (elements.shardCount) {
+            elements.shardCount.textContent = totalShards === null
+                ? `${uniqueShards.length} reported`
+                : `${totalShards} ${totalShards === 1 ? "shard" : "shards"}`;
+        }
 
-        renderShardGrid(shards);
+        renderShardGrid(uniqueShards);
     }
 
     async function refreshStatus() {
@@ -356,8 +388,14 @@
             render(data);
         } catch (error) {
             setOverallState("error");
-            elements.lastUpdated.textContent = "Unable to refresh status";
-            elements.processUptime.textContent = "—";
+
+            if (elements.lastUpdated) {
+                elements.lastUpdated.textContent = "Unable to refresh status";
+            }
+
+            if (elements.processUptime) {
+                elements.processUptime.textContent = "—";
+            }
 
             console.error("Joinly status refresh failed:", error);
         }
